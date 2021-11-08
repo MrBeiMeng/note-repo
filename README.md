@@ -10,6 +10,18 @@
 
 LeetCode每周习题笔记
 
+### vue 基础-进阶
+
+资料视频：[vuejs从入门到精通](https://www.bilibili.com/video/BV1Zy4y1K7SH?from=search&seid=12056711177763194825&spm_id_from=333.337.0.0)
+
+> `尚硅谷Vue2.0+Vue3.0全套教程丨vuejs从入门到精通_哔哩哔哩_bilibili`
+>
+> 开始学习时间: 2021年11月8日
+>
+> 笔记仓库: []
+
+
+
 ### JavaSE基础
 
 路径：javaSE/java.md
