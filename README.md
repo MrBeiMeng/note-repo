@@ -1,10 +1,22 @@
 # 笔记本-gitee 仓库 😶‍🌫️
 
-## error
+[TOC]
 
-路径：error/
+## LeetCode
 
-> 记录学习过程中遇到的所有bug
+路径：LeetCode习题淦克/三周题目总结/三周题目总结.md
+
+LeetCode每周习题笔记
+
+## 跟进项目
+
+###  [尚医通](https://www.bilibili.com/video/BV1V5411K7rT?from=search&seid=10090554625732272325&spm_id_from=333.337.0.0)
+
+> **尚硅谷Java微服务+分布式+全栈项目【尚医通】_哔哩哔哩_bilibili**
+>
+> 开展2021年11月8日
+>
+> 
 
 ## JavaEE企业级开发
 
@@ -12,17 +24,11 @@
 
 > 学习javaEE企业级开发
 
-## JavaSE 
+## JavaSE基础
 
 路径：javaSE/java.md
 
 > java基础操作
-
-## LeetCode
-
-路径：LeetCode习题淦克/三周题目总结/三周题目总结.md
-
-LeetCode每周习题笔记
 
 ## Linux系统管理与自动化运维
 
@@ -46,7 +52,11 @@ LeetCode每周习题笔记
 
 路径：杂项/知识体系.md
 
+## 错误记录
 
+路径：error/
+
+> 记录学习过程中遇到的所有bug
 
 
 
