@@ -2,11 +2,39 @@
 
 [TOC]
 
-## LeetCode
+## 知识体系
+
+### LeetCode 算法
 
 路径：LeetCode习题淦克/三周题目总结/三周题目总结.md
 
 LeetCode每周习题笔记
+
+### JavaSE基础
+
+路径：javaSE/java.md
+
+> java基础操作
+
+### JavaEE企业级开发
+
+路径：javaEE企业级开发/javaEE企业级开发.md
+
+> 学习javaEE企业级开发
+
+### UML系统建模
+
+路径：UML系统建模及系统分析与设计/learn.md
+
+### Linux系统管理与自动化运维
+
+路径：Linux系统管理与自动化运维/linux.md
+
+> linux的基础操作
+
+
+
+------
 
 ## 跟进项目
 
@@ -14,45 +42,27 @@ LeetCode每周习题笔记
 
 > **尚硅谷Java微服务+分布式+全栈项目【尚医通】_哔哩哔哩_bilibili**
 >
-> 开展2021年11月8日
->
-> 
+> 开展时间:2021年11月8日
 
-## JavaEE企业级开发
 
-路径：javaEE企业级开发/javaEE企业级开发.md
 
-> 学习javaEE企业级开发
+------
 
-## JavaSE基础
+## 其他
 
-路径：javaSE/java.md
-
-> java基础操作
-
-## Linux系统管理与自动化运维
-
-路径：Linux系统管理与自动化运维/linux.md
-
-> linux的基础操作
-
-## UML系统建模
-
-路径：UML系统建模及系统分析与设计/learn.md
-
-## 安装日志
+### 安装日志
 
 路径：杂项/安装日志.md
 
-## 常用操作
+### cmd调用windos程序命令集
 
 路径：杂项/常用操作.md
 
-## 知识体系
+### 知识体系
 
 路径：杂项/知识体系.md
 
-## 错误记录
+### 错误记录
 
 路径：error/
 
