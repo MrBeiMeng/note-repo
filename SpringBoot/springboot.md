@@ -1092,6 +1092,416 @@ springboot 启动会扫描以下位置的application.properties或者application
 ```
 java -jar spring-boot-config.jar --spring.config.location=F:/application.properties
 ```
+# 自动配置原理在深入
+
+## 分析自动配置原理
+
+以**HttpEncodingAutoConfiguration（Http编码自动配置）**为例解释自动配置原理；
+
+```java
+//表示这是一个配置类，和以前编写的配置文件一样，也可以给容器中添加组件；
+@Configuration 
+
+//启动指定类的ConfigurationProperties功能；
+  //进入这个HttpProperties查看，将配置文件中对应的值和HttpProperties绑定起来；
+  //并把HttpProperties加入到ioc容器中
+@EnableConfigurationProperties({HttpProperties.class}) 
+
+//Spring底层@Conditional注解
+  //根据不同的条件判断，如果满足指定的条件，整个配置类里面的配置就会生效；
+  //这里的意思就是判断当前应用是否是web应用，如果是，当前配置类生效
+@ConditionalOnWebApplication(
+    type = Type.SERVLET
+)
+
+//判断当前项目有没有这个类CharacterEncodingFilter；SpringMVC中进行乱码解决的过滤器；
+@ConditionalOnClass({CharacterEncodingFilter.class})
+
+//判断配置文件中是否存在某个配置：spring.http.encoding.enabled；
+  //如果不存在，判断也是成立的
+  //即使我们配置文件中不配置pring.http.encoding.enabled=true，也是默认生效的；
+@ConditionalOnProperty(
+    prefix = "spring.http.encoding",
+    value = {"enabled"},
+    matchIfMissing = true
+)
+
+public class HttpEncodingAutoConfiguration {
+    //他已经和SpringBoot的配置文件映射了
+    private final Encoding properties;
+    //只有一个有参构造器的情况下，参数的值就会从容器中拿
+    public HttpEncodingAutoConfiguration(HttpProperties properties) {
+        this.properties = properties.getEncoding();
+    }
+    
+    //给容器中添加一个组件，这个组件的某些值需要从properties中获取
+    @Bean
+    @ConditionalOnMissingBean //判断容器没有这个组件？
+    public CharacterEncodingFilter characterEncodingFilter() {
+        CharacterEncodingFilter filter = new OrderedCharacterEncodingFilter();
+        filter.setEncoding(this.properties.getCharset().name());
+        filter.setForceRequestEncoding(this.properties.shouldForce(org.springframework.boot.autoconfigure.http.HttpProperties.Encoding.Type.REQUEST));
+        filter.setForceResponseEncoding(this.properties.shouldForce(org.springframework.boot.autoconfigure.http.HttpProperties.Encoding.Type.RESPONSE));
+        return filter;
+    }
+    //。。。。。。。
+}
+```
+
+**句话总结 ：根据当前不同的条件判断，决定这个配置类是否生效！**
+
+- 一但这个配置类生效；这个配置类就会给容器中添加各种组件；
+- 这些组件的属性是从对应的properties类中获取的，这些类里面的每一个属性又是和配置文件绑定的；
+- 所有在配置文件中能配置的属性都是在xxxxProperties类中封装着；
+- 配置文件能配置什么就可以参照某个功能对应的这个属性类
+
+```java
+//从配置文件中获取指定的值和bean的属性进行绑定
+@ConfigurationProperties(prefix = "spring.http") 
+public class HttpProperties {
+    // .....
+}
+```
+
+我们去配置文件里面试试前缀，看提示！
+
+![image-20211111082914099](https://gitee.com/xie-zhiqing1/image/raw/master/typora/image-20211111082914099.png)
+
+**这就是自动装配的原理！**
+
+## 精髓
+
+1、SpringBoot启动会加载大量的自动配置类
+
+2、我们看我们需要的功能有没有在SpringBoot默认写好的自动配置类当中；
+
+3、我们再来看这个自动配置类中到底配置了哪些组件；（只要我们要用的组件存在在其中，我们就不需要再手动配置了）
+
+4、给容器中自动配置类添加组件的时候，会从properties类中获取某些属性。我们只需要在配置文件中指定这些属性的值即可；
+
+**xxxxAutoConfigurartion：自动配置类；**给容器中添加组件
+
+**xxxxProperties:封装配置文件中相关属性；**
+
+# web开发静态资源处理
+
+## 第一种静态资源映射规则
+
+SpringBoot中，SpringMVC的web配置都在 WebMvcAutoConfiguration 这个配置类里面；
+
+我们可以去看看 WebMvcAutoConfigurationAdapter 中有很多配置方法；
+
+有一个方法：addResourceHandlers 添加资源处理
+
+```java
+@Override
+public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    if (!this.resourceProperties.isAddMappings()) {
+        // 已禁用默认资源处理
+        logger.debug("Default resource handling disabled");
+        return;
+    }
+    // 缓存控制
+    Duration cachePeriod = this.resourceProperties.getCache().getPeriod();
+    CacheControl cacheControl = this.resourceProperties.getCache().getCachecontrol().toHttpCacheControl();
+    // webjars 配置
+    if (!registry.hasMappingForPattern("/webjars/**")) {
+        customizeResourceHandlerRegistration(registry.addResourceHandler("/webjars/**")
+                                             .addResourceLocations("classpath:/META-INF/resources/webjars/")
+                                             .setCachePeriod(getSeconds(cachePeriod)).setCacheControl(cacheControl));
+    }
+    // 静态资源配置
+    String staticPathPattern = this.mvcProperties.getStaticPathPattern();
+    if (!registry.hasMappingForPattern(staticPathPattern)) {
+        customizeResourceHandlerRegistration(registry.addResourceHandler(staticPathPattern)
+                                             .addResourceLocations(getResourceLocations(this.resourceProperties.getStaticLocations()))
+                                             .setCachePeriod(getSeconds(cachePeriod)).setCacheControl(cacheControl));
+    }
+}
+```
+
+读一下源代码：比如所有的 /webjars/** ， 都需要去 classpath:/META-INF/resources/webjars/ 找对应的资源；
+
+## 什么是webjars 呢？
+
+Webjars本质就是以jar包的方式引入我们的静态资源 ， 我们以前要导入一个静态资源文件，直接导入即可。
+
+使用SpringBoot需要使用Webjars，我们可以去搜索一下：
+
+网站：https://www.webjars.org
+
+要使用jQuery，我们只要要引入jQuery对应版本的pom依赖即可！
+
+```xml
+<dependency>
+    <groupId>org.webjars</groupId>
+    <artifactId>jquery</artifactId>
+    <version>3.4.1</version>
+</dependency>
+```
+
+![image-20211111123247515](https://gitee.com/xie-zhiqing1/image/raw/master/typora/image-20211111123247515.png)
+
+访问：只要是静态资源，SpringBoot就会去对应的路径寻找资源，我们这里访问：http://localhost:8080/webjars/jquery/3.4.1/jquery.js
+
+## 第二种静态资源映射规则
+
+我们去找staticPathPattern发现第二种映射规则 ：/** , 访问当前的项目任意资源，它会去找 resourceProperties 这个类，我们可以点进去看一下分析：
+
+```java
+// 进入方法
+public String[] getStaticLocations() {
+    return this.staticLocations;
+}
+// 找到对应的值
+private String[] staticLocations = CLASSPATH_RESOURCE_LOCATIONS;
+// 找到路径
+private static final String[] CLASSPATH_RESOURCE_LOCATIONS = { 
+    "classpath:/META-INF/resources/",
+  "classpath:/resources/", 
+    "classpath:/static/", 
+    "classpath:/public/" 
+};
+```
+
+以下四个目录存放的静态资源可以被我们识别：
+
+```java
+"classpath:/META-INF/resources/"
+"classpath:/resources/"
+"classpath:/static/"
+"classpath:/public/"
+```
+
+![image-20211111123709926](https://gitee.com/xie-zhiqing1/image/raw/master/typora/image-20211111123709926.png)
+
+优先级：resources>static>public
+
+## 自定义静态资源路径
+
+我们也可以自己通过配置文件来指定一下，哪些文件夹是需要我们放静态资源文件的，在application.properties中配置；
+
+```java
+pring.resources.static-locations=classpath:/coding/,classpath:/kuang/
+```
+
+**一旦自己定义了静态文件夹的路径，原来的自动配置就都会失效了！**
+
+## 首页处理
+
+```java
+private Optional<Resource> getWelcomePage() {
+    String[] locations = getResourceLocations(this.resourceProperties.getStaticLocations());
+    // ::是java8 中新引入的运算符
+    // Class::function的时候function是属于Class的，应该是静态方法。
+    // this::function的funtion是属于这个对象的。
+    // 简而言之，就是一种语法糖而已，是一种简写
+    return Arrays.stream(locations).map(this::getIndexHtml).filter(this::isReadable).findFirst();
+}
+// 欢迎页就是一个location下的的 index.html 而已
+private Resource getIndexHtml(String location) {
+    return this.resourceLoader.getResource(location + "index.html");
+}
+```
+
+欢迎页，静态资源文件夹下的所有 index.html 页面；被 /** 映射。比如我访问  http://localhost:8080/ ，就会找静态资源文件夹下的 index.html
+
+# Thymeleaf模板引擎
+
+**SpringBoot推荐你可以来使用模板引擎：**
+
+模板引擎，我们其实大家听到很多，其实jsp就是一个模板引擎，还有用的比较多的freemarker，包括SpringBoot给我们推荐的Thymeleaf，模板引擎有非常多，但再多的模板引擎，他们的思想都是一样的
+
+![image-20211111170718224](https://gitee.com/xie-zhiqing1/image/raw/master/typora/image-20211111170718224.png)
+
+Thymeleaf模板引擎，这模板引擎呢，是一个高级语言的模板引擎，他的这个语法更简单。而且呢，功能更强大。
+
+## 引入Thymeleaf
+
+Thymeleaf 官网：https://www.thymeleaf.org/
+
+Thymeleaf 在Github 的主页：https://github.com/thymeleaf/thymeleaf
+
+Spring官方文档：找到我们对应的版本
+
+https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#using-boot-starter
+
+找到对应的pom依赖：可以适当点进源码看下本来的包！
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.thymeleaf</groupId>
+    <artifactId>thymeleaf-spring5</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.thymeleaf.extras</groupId>
+    <artifactId>thymeleaf-extras-java8time</artifactId>
+</dependency>
+```
+
+## Thymeleaf分析
+
+前面呢，我们已经引入了Thymeleaf，那这个要怎么使用呢？
+
+我们首先得按照SpringBoot的自动配置原理看一下我们这个Thymeleaf的自动配置规则，在按照那个规则，我们进行使用。
+
+我们去找一下Thymeleaf的自动配置类：ThymeleafProperties
+
+```java
+@ConfigurationProperties(
+    prefix = "spring.thymeleaf"
+)
+public class ThymeleafProperties {
+    private static final Charset DEFAULT_ENCODING;
+    public static final String DEFAULT_PREFIX = "classpath:/templates/";
+    public static final String DEFAULT_SUFFIX = ".html";
+    private boolean checkTemplate = true;
+    private boolean checkTemplateLocation = true;
+    private String prefix = "classpath:/templates/";
+    private String suffix = ".html";
+    private String mode = "HTML";
+    private Charset encoding;
+}
+```
+
+我们可以在其中看到默认的前缀和后缀！
+
+我们只需要把我们的html页面放在类路径下的templates下，thymeleaf就可以帮我们自动渲染了。
+
+使用thymeleaf什么都不需要配置，只需要将他放在指定的文件夹下即可！
+
+## Thymeleaf 语法学习
+
+要学习语法，还是参考官网文档最为准确，我们找到对应的版本看一下；
+
+Thymeleaf 官网：https://www.thymeleaf.org/ ， 简单看一下官网！我们去下载Thymeleaf的官方文档！
+
+1、修改测试请求，增加数据传输；
+
+```java
+@RequestMapping("/t1")
+public String test1(Model model){
+    //存入数据
+    model.addAttribute("msg","Hello,Thymeleaf");
+    //classpath:/templates/test.html
+    return "test";
+}
+```
+
+2、我们要使用thymeleaf，需要在html文件中导入命名空间的约束，方便提示。
+
+我们可以去官方文档的#3中看一下命名空间拿来过来：
+
+```
+ xmlns:th="http://www.thymeleaf.org"
+```
+
+3、我们去编写下前端页面
+
+```java
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>测试页面</h1>
+
+<!--th:text就是将div中的内容设置为它指定的值，和之前学习的Vue一样
+    所有的html元素都可以被thymeleof替换接管： th: 元素名
+    -->
+<div th:text="${msg}"></div>
+</body>
+</html>
+```
+
+**1、我们可以使用任意的 th:attr 来替换Html中原生属性的值！**
+
+![image-20211111174958341](https://gitee.com/xie-zhiqing1/image/raw/master/typora/image-20211111174958341.png)
+
+```java
+ Selection Variable Expressions: *{...}：选择表达式：和${}在功能上是一样；普通变量
+  Message Expressions: #{...}：获取国际化内容
+  Link URL Expressions: @{...}：定义URL；
+  Fragment Expressions: ~{...}：片段引用表达式
+      Literals（字面量）
+      Text literals: 'one text' , 'Another one!' ,…
+      Number literals: 0 , 34 , 3.0 , 12.3 ,…
+      Boolean literals: true , false
+      Null literal: null
+      Literal tokens: one , sometext , main ,…
+      
+Text operations:（文本操作）
+    String concatenation: +
+    Literal substitutions: |The name is ${name}|
+    
+Arithmetic operations:（数学运算）
+    Binary operators: + , - , * , / , %
+    Minus sign (unary operator): -
+    
+Boolean operations:（布尔运算）
+    Binary operators: and , or
+    Boolean negation (unary operator): ! , not
+    
+Comparisons and equality:（比较运算）
+    Comparators: > , < , >= , <= ( gt , lt , ge , le )
+    Equality operators: == , != ( eq , ne )
+    
+Conditional operators:条件运算（三元运算符）
+    If-then: (if) ? (then)
+    If-then-else: (if) ? (then) : (else)
+    Default: (value) ?: (defaultvalue)
+    
+Special tokens:
+    No-Operation: _
+```
+
+**练习测试：**
+
+```java
+@RequestMapping("/t2")
+public String test2(Map<String,Object> map){
+    //存入数据
+    map.put("msg","<h1>Hello</h1>");
+    map.put("users", Arrays.asList("qinjiang","kuangshen"));
+    //classpath:/templates/test.html
+    return "test";
+}
+```
+
+```java
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>狂神说</title>
+</head>
+<body>
+<h1>测试页面</h1>
+
+<div th:text="${msg}"></div>
+<!--不转义-->
+<div th:utext="${msg}"></div>
+
+<!--遍历数据-->
+<!--th:each每次遍历都会生成当前这个标签：官网#9-->
+<h4 th:each="user :${users}" th:text="${user}"></h4>
+
+<h4>
+    <!--行内写法：官网#12-->
+    <span th:each="user:${users}">[[${user}]]</span>
+</h4>
+
+</body>
+</html>
+
+```
+
 
 
       
