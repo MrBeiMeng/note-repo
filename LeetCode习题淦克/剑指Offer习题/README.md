@@ -96,3 +96,43 @@
 
 <hr style="background:#ffd04c;margin: 0 60px">
 
+## [剑指 Offer 11. 旋转数组的最小数字](https://leetcode-cn.com/problems/xuan-zhuan-shu-zu-de-zui-xiao-shu-zi-lcof/)
+
+![image-20211206103909848](file://C:\Users\11923\AppData\Roaming\Typora\typora-user-images\image-20211206103909848.png?lastModify=1638758748)
+
+> **解题方案**
+>
+> 思路：二分查找
+>
+> - 数组是有大小顺序的，从左到右，第一个非递增的数就是答案
+> - 二分查找时，如果**nums[mid]**值比**nums[right]**值大，那么answer(**第一个非递增的数**)在mid的右边，left = mid+1;
+> - 二分查找时，如果nums[mid]值比nums[right]小，说明mid到right处于第二个递增中，answer 在 mid左边，right=mid;
+> - 二分查找时，如果mid 和 right相等right--;
+> - 保证left < right
+>
+> <video src="https://ccurj.oss-cn-beijing.aliyuncs.com/二分查找最小数字.mp4"></video>
+>
+> ```java
+> class Solution {
+>     public int minArray(int[] numbers) {
+>         int left = 0;
+>         int right = numbers.length - 1;
+>         while (left < right) {
+>             int mid = (right + left) / 2;
+>             if (numbers[mid] < numbers[right]) {
+>                 right = mid;
+>             } else if (numbers[mid] > numbers[right]) {
+>                 left = mid + 1;
+>             } else {
+>                 right --;
+>             }
+>         }
+>         return numbers[left];
+>     }
+> }
+> ```
+>
+> 
+>
+> 
+
