@@ -1,6 +1,8 @@
 # 剑指🗡Offer
 
-## [剑指 Offer 04. 二维数组中的查找](https://leetcode-cn.com/problems/er-wei-shu-zu-zhong-de-cha-zhao-lcof/)
+## 数组和字符串📶
+
+### [剑指 Offer 04. 二维数组中的查找](https://leetcode-cn.com/problems/er-wei-shu-zu-zhong-de-cha-zhao-lcof/)
 
 ![image-20211206101452475](https://ccurj.oss-cn-beijing.aliyuncs.com/image-20211206101452475.png)
 
@@ -38,7 +40,7 @@
 
 <hr style="background:#ffd04c;margin: 0 60px">
 
-## [剑指 Offer 05. 替换空格](https://leetcode-cn.com/problems/ti-huan-kong-ge-lcof/)
+### [剑指 Offer 05. 替换空格](https://leetcode-cn.com/problems/ti-huan-kong-ge-lcof/)
 
 
 ![image-20211206102151052](https://ccurj.oss-cn-beijing.aliyuncs.com/image-20211206102151052.png)
@@ -97,8 +99,7 @@
 > 综上，在执行效率方面，StringBuilder最高，StringBuffer次之，String最低，对于这种情况，一般而言，如果要操作的数量比较小，应优先使用String类；如果是在单线程下操作大量数据，应优先使用StringBuilder类；如果是在多线程下操作大量数据，应优先使用StringBuilder类。
 
 <hr style="background:#ffd04c;margin: 0 60px">
-
-## [剑指 Offer 11. 旋转数组的最小数字](https://leetcode-cn.com/problems/xuan-zhuan-shu-zu-de-zui-xiao-shu-zi-lcof/)
+### [剑指 Offer 11. 旋转数组的最小数字](https://leetcode-cn.com/problems/xuan-zhuan-shu-zu-de-zui-xiao-shu-zi-lcof/)
 
 ![image-20211206103909848](file://C:\Users\11923\AppData\Roaming\Typora\typora-user-images\image-20211206103909848.png?lastModify=1638758748)
 
@@ -136,7 +137,7 @@
 
 <hr style="background:#ffd04c;margin: 0 60px">
 
-## [剑指 Offer 17. 打印从1到最大的n位数](https://leetcode-cn.com/problems/da-yin-cong-1dao-zui-da-de-nwei-shu-lcof/)
+### [剑指 Offer 17. 打印从1到最大的n位数](https://leetcode-cn.com/problems/da-yin-cong-1dao-zui-da-de-nwei-shu-lcof/)
 
 ![image-20211206112930787](https://ccurj.oss-cn-beijing.aliyuncs.com/image-20211206112930787.png)
 
@@ -157,6 +158,49 @@
 >         for(int i=0;i<num;i++)
 >             answer[i] = i+1;
 >         return answer;
+>     }
+> }
+> ```
+
+<hr style="background:#ffd04c;margin: 0 60px">
+
+### [剑指 Offer 21. 调整数组顺序使奇数位于偶数前面](https://leetcode-cn.com/problems/diao-zheng-shu-zu-shun-xu-shi-qi-shu-wei-yu-ou-shu-qian-mian-lcof/)
+
+![image-20211206131703503](https://ccurj.oss-cn-beijing.aliyuncs.com/image-20211206131703503.png)
+
+> **解题方案**
+>
+> 思路 双指针
+>
+> - 首先指定前指针 `start` 和后指针 `end`，然后前指针定位偶数，后指针定位奇数，定位到之后将两个值互换，直到数组遍历完成
+> - 时间复杂度：O(n)，空间复杂度：O(1)
+>
+> **算法流程**
+>
+> 1. 初始化前指针 start = 0，后指针 end = nums.length - 1
+> 2. 当 start < end 时表示该数组还未遍历完成，则继续进行奇数和偶数的交换
+> 3. 当 nums[start] 为奇数时，则 start++，直到找到不为奇数的下标为止
+> 4. 当 nums[end] 为偶数时，则 end--，直到找到不为偶数的下标为止
+> 5. 交换 nums[start] 和 nums[end]，继续下一轮交换
+> 6. 返回 nums，即为交换后的结果
+>
+> ```java
+> class Solution {
+>     public int[] exchange(int[] nums) {
+>         int start = 0;
+>         int end = nums.length - 1;
+>         while(start < end) {
+>             while(start < end && (nums[start] % 2) == 1) {
+>                 start++;
+>             }
+>             while(start < end && (nums[end] % 2) == 0) {
+>                 end--;
+>             }
+>             int tmp = nums[start];
+>             nums[start] = nums[end];
+>             nums[end] = tmp;
+>         }
+>         return nums;
 >     }
 > }
 > ```
