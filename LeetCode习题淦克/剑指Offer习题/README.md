@@ -37,7 +37,9 @@
 > 
 
 <hr style="background:#ffd04c;margin: 0 60px">
+
 ## [剑指 Offer 05. 替换空格](https://leetcode-cn.com/problems/ti-huan-kong-ge-lcof/)
+
 
 ![image-20211206102151052](https://ccurj.oss-cn-beijing.aliyuncs.com/image-20211206102151052.png)
 
@@ -131,8 +133,33 @@
 >     }
 > }
 > ```
+
+<hr style="background:#ffd04c;margin: 0 60px">
+
+## [剑指 Offer 17. 打印从1到最大的n位数](https://leetcode-cn.com/problems/da-yin-cong-1dao-zui-da-de-nwei-shu-lcof/)
+
+![image-20211206112930787](https://ccurj.oss-cn-beijing.aliyuncs.com/image-20211206112930787.png)
+
+> 此题的测试集有一些问题，本题的愿意应该是处理一些大数。比如当n=10的情况
 >
-> 
+> 有两种可能溢出的情况
 >
-> 
+> - int最大是2^31-1 = 2,147,483,647 是九位，当n>=10时,数组中就会有些元素大于int上限。
+> - java 数组长度受限于int,一旦那个数大于int上限，那么由他组成的数组长度也会超出int上限。
+>
+> 但此题规定的返回值类型时int,有点自相矛盾。
+>
+> ```java
+> class Solution {
+>     public int[] printNumbers(int n) {
+>         int num = (int)Math.pow(10,n)-1;
+>         int[] answer = new int[num];
+>         for(int i=0;i<num;i++)
+>             answer[i] = i+1;
+>         return answer;
+>     }
+> }
+> ```
+
+<hr style="background:#ffd04c;margin: 0 60px">
 
