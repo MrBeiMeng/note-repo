@@ -206,4 +206,54 @@
 > ```
 
 <hr style="background:#ffd04c;margin: 0 60px">
+### [剑指 Offer 29. 顺时针打印矩阵](https://leetcode-cn.com/problems/shun-shi-zhen-da-yin-ju-zhen-lcof/)
+
+![image-20211207101659326](https://ccurj.oss-cn-beijing.aliyuncs.com/image-20211207101659326.png)
+
+> **解题方案**
+>
+> 思路：
+>
+> - 二维数组
+> - 整体思路，循环遍历整个数组，循环中再嵌套四个循环，分别是从左至右，从上到下，从右到左，从下到上，几个方向，控制好边界
+> - m为行数，n为列数，时间复杂度O(mn),空间复杂度O(1)
+>
+> **算法流程**
+>
+> 1. 题目中 matrix 有可能为空，直接返回空数组即可
+> 2. 初始化边界 left、right、top、bottom 四个值，初始化结果数组 res 和数组下标 x
+> 3. 按照遍历方向循环取出数字放入结果数组中
+>
+> 
+>
+> - 从左至右：遍历完成后 ++top，如果 top > bottom，到达边界循环结束
+> - 从上至下：遍历完成后 --right，如果 left > right，到达边界循环结束
+> - 从右至左：遍历完成后 --bottom，如果 top > bottom，到达边界循环结束
+> - 从下至上：遍历完成后 ++left，如果 left > right，到达边界循环结束
+>   代码
+>
+> ```java
+> class Solution {
+>     public int[] spiralOrder(int[][] matrix) {
+>         if(matrix.length == 0) return new int[0];
+>         int left = 0, right = matrix[0].length - 1, top = 0, bottom = matrix.length - 1, x = 0;
+>         int[] res = new int[(right + 1) * (bottom + 1)];
+>         while(true) {
+>             for(int i = left; i <= right; i++) res[x++] = matrix[top][i];
+>             if(++top > bottom) break;
+>             for(int i = top; i <= bottom; i++) res[x++] = matrix[i][right];
+>             if(left > --right) break;
+>             for(int i = right; i >= left; i--) res[x++] = matrix[bottom][i];
+>             if(top > --bottom) break;
+>             for(int i = bottom; i >= top; i--) res[x++] = matrix[i][left];
+>             if(++left > right) break;
+>         }
+>         return res;
+>     }
+> }
+> ```
+>
+> <video src="C:/Users/11923/Pictures/Saved%20Pictures/%E9%A1%BA%E6%97%B6%E9%92%88%E9%81%8D%E5%8E%86%E6%95%B0%E7%BB%84.mp4"></video>
+
+<hr style="background:#ffd04c;margin: 0 60px">
 
