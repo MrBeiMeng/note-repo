@@ -40,10 +40,12 @@ ln -s /usr/local/python3/bin/pip3 /usr/bin/python3
 > 修改pip 国内源
 
 ```shell
-pip3 config set global.index-url http://mirrors.aliyun.com/pypi/simple/
-pip3 config set install.trusted-host mirrors.aliyun.com
+ config set global.index-url https://pypi.mirrors.ustc.edu.cn/simple/    
+pip3 config set install.trusted-host mirrors.ustc.edu.cn
 pip3 config list
 # 显示结果：
 # pip config set global.index-url http://mirrors.aliyun.com/pypi/simple/
 # pip config set install.trusted-host mirrors.aliyun.com
 ```
+
+- 
