@@ -136,7 +136,7 @@ PySpark 是 Spark 的一种基于 python 的操作方式，程序调试好要上
 
 ### 本机开发环境搭建
 
-```python
+```shell
 pip install pyspark pyhive jieba
 ```
 
