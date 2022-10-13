@@ -62,6 +62,7 @@
 
 [我的题解-java](../code_place/JavaCode/src/main/java/TwoNum.java)
 [我的题解-python](../code_place/PythonCode/src/two_num.py)
+[我的题解-golang](../code_place/GoCode/two_num.go)
 </div>
 
 
