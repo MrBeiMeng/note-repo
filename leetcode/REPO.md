@@ -60,7 +60,8 @@
   <span>🔑 解题思路</span>
   <p style="display: none">用一个值去寻找另一个值</p>
 
-[我的题解-java](./个人题解/1两数之和.md)
+[我的题解-java](../code_place/JavaCode/src/main/java/TwoNum.java)
+[我的题解-python](../code_place/PythonCode/src/two_num.py)
 </div>
 
 
