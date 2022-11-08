@@ -2,6 +2,7 @@ package new_user_list
 
 import (
 	"fmt"
+	"goland_code/type_def"
 	//"go_puzz_code/utils"
 )
 
@@ -43,7 +44,12 @@ func RomanToInt(s string) int {
 	return resultInt
 }
 
-func RunRomanToInt() {
+func InitRomanToIntFunc(funcMap map[int]type_def.LProjectImpl) {
+	lP := type_def.NewLProjectImpl("罗马数字转整数", 0, runRomanToInt, 13)
+	funcMap[lP.CodeNum] = lP
+}
+
+func runRomanToInt() {
 	arguments := []string{"MCMXCIV"}
 	fmt.Printf("args |\t %v \n", arguments)
 	results := RomanToInt(arguments[0])

@@ -2,6 +2,7 @@ package new_user_list
 
 import (
 	"fmt"
+	"goland_code/type_def"
 	"goland_code/utils"
 )
 
@@ -45,7 +46,12 @@ func canConstruct2(ransomNote, magazine string) bool { // 官方题解：思路�
 	return true
 }
 
-func RunCanConstruct() {
+func InitRansomNoteFunc(funcMap map[int]type_def.LProjectImpl) {
+	impl := type_def.NewLProjectImpl("赎金信", 0, runCanConstruct, 383)
+	funcMap[impl.CodeNum] = impl
+}
+
+func runCanConstruct() {
 	arguments := []string{"abc", "aabbcc"}
 	fmt.Printf("args |\t %v \n", arguments)
 	results := canConstruct(arguments[0], arguments[1])

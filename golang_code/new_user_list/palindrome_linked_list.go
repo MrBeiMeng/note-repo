@@ -2,6 +2,7 @@ package new_user_list
 
 import (
 	"fmt"
+	"goland_code/type_def"
 	"goland_code/utils"
 )
 
@@ -78,7 +79,12 @@ func getLen(head *ListNode) (length int) {
 	return length
 }
 
-func RunIsPalindrome() {
+func InitPalindromeLinkedListFunc(funcMap map[int]type_def.LProjectImpl) {
+	lP := type_def.NewLProjectImpl("回文链表", 0, runIsPalindrome, 234)
+	funcMap[lP.CodeNum] = lP
+}
+
+func runIsPalindrome() {
 
 	var head ListNode
 	head.Val = 9
