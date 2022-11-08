@@ -103,6 +103,7 @@ func initMap() map[int]type_def.LProjectImpl {
 	new_user_list.InitPalindromeLinkedListFunc(keyProjMap)
 	new_user_list.InitRansomNoteFunc(keyProjMap)
 	new_user_list.InitRomanToIntFunc(keyProjMap)
+	new_user_list.InitWeakestRowInMatrixFunc(keyProjMap)
 
 	return keyProjMap
 }
