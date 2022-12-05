@@ -7,6 +7,7 @@ import (
 	"goland_code/utils"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // 应该是反射获取整个文件夹下的所有程序，放到集合中，再去搞
@@ -79,8 +80,9 @@ func analyseInput(inputStr string, tmap map[int]type_def.LeetCodeProject) {
 		}
 		num, _ := strconv.Atoi(resultList[1])
 		if proj, ok := tmap[num]; ok {
-			//proj.GetInitFunc()()
+			preTime := time.Now()
 			proj.Run()
+			fmt.Printf("\t方法用时 [%s]\n", time.Now().Sub(preTime))
 		}
 		return
 	}
