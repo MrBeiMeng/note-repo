@@ -1,0 +1,8 @@
+# 常用的命令配置
+show_commands:
+  -show
+  -print
+
+run_commands:
+  -run
+  -go
